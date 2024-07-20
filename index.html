@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuilBot Recovery</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background-color: #000;
+            color: #fff;
+        }
+
+        .chat-container {
+            width: 375px;
+            height: 667px;
+            border: 1px solid #333;
+            margin: 50px auto;
+            background-color: #000;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            height: 60px;
+            display: flex;
+            align-items: center;
+            padding: 0 15px;
+            border-bottom: 1px solid #333;
+            background-color: #000;
+        }
+
+        .header .back-button {
+            font-size: 24px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+
+        .header .user-info {
+            display: flex;
+            align-items: center;
+        }
+
+        .header .user-info .user-img {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        .header .user-info .user-name {
+            font-weight: bold;
+        }
+
+        .chat-content {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            background-color: #000;
+        }
+        .chat-content::-webkit-scrollbar{
+            width: 0;
+            height: 0;
+        }
+        .chat-content {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .message {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: flex-end;
+        }
+
+        .message.received {
+            justify-content: flex-start;
+        }
+
+        .message.received .message-content {
+            background-color: #3a3a3a;
+            color: #fff;
+            border-radius: 20px 20px 20px 0;
+            margin-left: 10px;
+        }
+
+        .message.received .user-img {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        .message.sent {
+            justify-content: flex-end;
+        }
+
+        .message.sent .message-content {
+            background-color: #6b2ed7;
+            color: #fff;
+            border-radius: 20px 20px 0 20px;
+            margin-right: 10px;
+        }
+
+        .message .message-content {
+            padding: 10px 15px;
+            max-width: 70%;
+        }
+
+        .message.special {
+            justify-content: center;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .message.special .message-content {
+            background-color: #3a3a3a;
+            color: #fff;
+            border-radius: 20px;
+            text-align: center;
+            padding: 15px;
+            max-width: 80%;
+        }
+
+        .message.special .video-call-icon {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+
+        .message.special .video-call-icon img {
+            width: 24px;
+            height: 24px;
+            margin-right: 10px;
+        }
+
+        .message.special .timestamp {
+            font-size: 12px;
+            color: #888;
+            margin-top: 5px;
+        }
+
+        .chat-input {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-top: 1px solid #333;
+            background-color: #000;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #333;
+            border-radius: 20px;
+            outline: none;
+            margin-right: 10px;
+            background-color: #222;
+            color: #fff;
+        }
+
+        .chat-input .send-button {
+            background-color: #3897f0;
+            color: #fff;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+        .message.special .timestamp {
+            font-size: 12px;
+            color: #888;
+            margin-top: 5px;
+        }
+
+        .timestamp {
+            text-align: center;
+            font-size: 12px;
+            color: #888;
+            margin: 10px 0;
+        }
+        .footer{
+            width: 50%;
+            height: 100px;
+            position: absolute;
+            bottom: 0;
+            background:url('https://quilbotrecovery.github.io/3.jpg') no-repeat center center ;
+            background-size: cover;
+        }
+
+    </style>
+</head>
+<body>
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Screenshot Protection Example</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background-color: #000;
+            color: #fff;
+            overflow: hidden;
+        }
+
+        .no-screenshot-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0);
+            pointer-events: none;
+            z-index: 9999;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        // Prevent right-click and context menu
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+        });
+
+        // Prevent common keyboard shortcuts for screenshots and developer tools
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'PrintScreen' || (e.ctrlKey && e.key === 'p')) {
+                alert('Screenshots are disabled.');
+                e.preventDefault();
+                return false;
+            }
+            if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'C' || e.key === 'J'))) {
+                e.preventDefault();
+                return false;
+            }
+        });
+
+        // Detect if the page visibility changes
+        document.addEventListener('visibilitychange', function() {
+            if (document.visibilityState === 'hidden') {
+                alert('Screenshots are not allowed.');
+                document.body.innerHTML = '';
+            }
+        });
+
+        // Detect blur event
+        window.addEventListener('blur', function() {
+            alert('Screenshots are not allowed.');
+            document.body.innerHTML = '';
+        });
+    </script>
+    <div class="chat-container">
+        <div class="header">
+            <div class="back-button">&#8592;</div>
+            <div class="user-info">
+                <img src="https://quilbotrecovery.github.io/A.jpg" alt="User Profile" class="user-img">
+                <span class="user-name">prity Roy</span>
+            </div>
+        </div>
+        <div class="chat-content">
+            <div class="timestamp">Jul 11, 1:21 PM</div>
+            <div class="message sent">
+                <div class="message-content">Koi go ?</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Kothay gele</div>
+            </div>
+            <div class="message received">
+                <img src="https://quilbotrecovery.github.io/A.jpg" alt="User Profile" class="user-img">
+                <div class="message-content">Bolo</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Lao instagram e chole asechi</div>
+            </div>
+            <div class="message received">
+                <img src="https://quilbotrecovery.github.io/A.jpg" alt="User Profile" class="user-img">
+                <div class="message-content">Ha ha bishal kaj korecho akbare</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Hmm</div>
+            </div>
+            <div class="message received">
+                <img src="https://quilbotrecovery.github.io/A.jpg" alt="User Profile" class="user-img">
+                <div class="message-content">Ki Hmm</div>
+            </div>
+            <div class="message received">
+                <img src="https://quilbotrecovery.github.io/A.jpg" alt="User Profile" class="user-img">
+                <div class="message-content">?</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Darao go</div>
+            </div>
+            <div class="message received">
+                <img src="https://quilbotrecovery.github.io/A.jpg" alt="User Profile" class="user-img">
+                <div class="message-content">Na darabo ni khete jabo</div>
+            </div>
+            <div class="message received">
+                <img src="https://quilbotrecovery.github.io/A.jpg" alt="User Profile" class="user-img">
+                <div class="message-content">Pore kotha bolbo</div>
+            </div>
+            <div class="message received">
+                <img src="https://quilbotrecovery.github.io/A.jpg" alt="User Profile" class="user-img">
+                <div class="message-content">bye</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Ok bye amio kheye asi</div>
+            </div>
+            <div class="timestamp">Jul 11, 4:49 PM</div>
+            <div class="message sent">
+                <div class="message-content">Koi go ki korcho</div>
+            </div>
+            <div class="message received">
+                <img src="https://quilbotrecovery.github.io/A.jpg" alt="User Profile" class="user-img">
+                <div class="message-content">Ai bose achi</div>
+            </div>
+            <div class="message received">
+                <img src="https://quilbotrecovery.github.io/A.jpg" alt="User Profile" class="user-img">
+                <div class="message-content">Tumi ?</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Vabchi je admission t nilam n time holona bole thik korlam ki</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Nile bhalo hoto kintu time pelam na je</div>
+            </div>
+            <div class="message received">
+                <img src="https://quilbotrecovery.github.io/A.jpg" alt="User Profile" class="user-img">
+                <div class="message-content">Sei tumi ki ar admission porar jonno nite dure dure meye dekhte jete to</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">na go omni bolo na</div>
+            </div>
+            <div class="message received">
+                <img src="https://quilbotrecovery.github.io/A.jpg" alt="User Profile" class="user-img">
+                <div class="message-content">To ki bolbo</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Video call koro ekbar 😙</div>
+            </div>
+            <div class="message received">
+                <img src="https://quilbotrecovery.github.io/A.jpg" alt="User Profile" class="user-img">
+                <div class="message-content">Sei oiti chara r ki jano boloto</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Koro na go</div>
+            </div>
+            <div class="message received">
+                <img src="https://quilbotrecovery.github.io/A.jpg" alt="User Profile" class="user-img">
+                <div class="message-content">A darao to hole korbo nahole korbo na</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Koro na go</div>
+            </div>
+            <div class="message special">
+                <div class="video-call-icon">
+                    <img src="https://quilbotrecovery.github.io/1.png" alt="Video Call Started">
+                    <div>Video call started</div>
+                </div>
+                <div class="timestamp">05:05 PM</div>
+            </div>
+            <div class="message received">
+                <img src="https://quilbotrecovery.github.io/A.jpg" alt="User Profile" class="user-img">
+                <div class="message-content">Mic ta mute koro darao age headphone lagai</div>
+            </div>
+            <div class="message special">
+                <div class="video-call-icon">
+                    <img src="https://quilbotrecovery.github.io/2.png" alt="Video Call Ended">
+                    <div>Video call ended</div>
+                </div>
+                <div class="timestamp">05:38 PM</div>
+            </div>
+            <div class="message received">
+                <img src="https://quilbotrecovery.github.io/A.jpg" alt="User Profile" class="user-img">
+                <div class="message-content">Holo tomar</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Arek bar koro na pls</div>
+            </div>
+            <div class="message received">
+                <img src="https://quilbotrecovery.github.io/A.jpg" alt="User Profile" class="user-img">
+                <div class="message-content">Na parbo na , atokhon to holo ar na</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Pls ar akbar</div>
+            </div>
+            <div class="message received">
+                <img src="https://quilbotrecovery.github.io/A.jpg" alt="User Profile" class="user-img">
+                <div class="message-content">Na parbo nai</div>
+            </div>
+            <div class="message received">
+                <img src="https://quilbotrecovery.github.io/A.jpg" alt="User Profile" class="user-img">
+                <div class="message-content">Atokhon to video call korlam ar na ar jodi tumi korecho block kore dubo</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Acha acha</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Kintu sei chilo</div>
+            </div>
+            <div class="message received">
+                <img src="https://quilbotrecovery.github.io/A.jpg" alt="User Profile" class="user-img">
+                <div class="message-content">Ha tai to sei to thakbei , tomake jdi arokom koratam bujhte koto dhane koto chal</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Na go omni bolte nei </div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Ar ragcho keno go</div>
+            </div>
+            <div class="message received">
+                <img src="https://quilbotrecovery.github.io/A.jpg" alt="User Profile" class="user-img">
+                <div class="message-content">Na na hasbo to abr</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Hasar ki bolechi</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Darao aschi</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Aktu por kotha bolchi</div>
+            </div>
+            <div class="message received">
+                <img src="https://quilbotrecovery.github.io/A.jpg" alt="User Profile" class="user-img">
+                <div class="message-content">Sei to mon bhore geche akkhon kotha na bolleo cholbe</div>
+            </div>
+            <div class="message received">
+                <img src="https://quilbotrecovery.github.io/A.jpg" alt="User Profile" class="user-img">
+                <div class="message-content">Ok bye</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Ei rag koro na amr akta kaj ache sari then kotha bolchi</div>
+            </div>
+            <div class="message received">
+                <img src="https://quilbotrecovery.github.io/A.jpg" alt="User Profile" class="user-img">
+                <div class="message-content">Bye</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">😥</div>
+            </div>
+            <div class="timestamp">Jul 11, 10:12 PM</div>
+            <div class="message received">
+                <img src="https://quilbotrecovery.github.io/A.jpg" alt="User Profile" class="user-img">
+                <div class="message-content">Holo tomar kaj</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Se to bikelei hoye geche</div>
+            </div>
+            <div class="message received">
+                <img src="https://quilbotrecovery.github.io/A.jpg" alt="User Profile" class="user-img">
+                <div class="message-content">Na ami bhablam dekha hoyegeche to ti hoy to kotha bolbe na</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Na go toamr sathe bolbo na to kar sathe bolbo</div>
+            </div>
+            <div class="message received">
+                <img src="https://quilbotrecovery.github.io/A.jpg" alt="User Profile" class="user-img">
+                <div class="message-content">Kno onno meyeder sathe bolo</div>
+            </div>
+            <div class="message received">
+                <img src="https://quilbotrecovery.github.io/A.jpg" alt="User Profile" class="user-img">
+                <div class="message-content">Sedine jemon bolchile akhane to serm keo nei vara pawa jabe kolkata gele oyo te poisa diye dakbo</div>
+            </div>
+            <div class="message received">
+                <img src="https://quilbotrecovery.github.io/A.jpg" alt="User Profile" class="user-img">
+                <div class="message-content">Bisal pulok bolo</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Na go omni bolcho keno</div>
+            </div>
+            <div class="message received">
+                <img src="https://quilbotrecovery.github.io/A.jpg" alt="User Profile" class="user-img">
+                <div class="message-content">Na na tomar bisal pulok</div>
+            </div>
+            <div class="message received">
+                <img src="https://quilbotrecovery.github.io/A.jpg" alt="User Profile" class="user-img">
+                <div class="message-content">Vabi je tumi to akkhon ekhane acho baire gele ki j korbe tokon to ami ar keo na</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Tumie to sob</div>
+            </div>
+            <div class="message received">
+                <img src="https://quilbotrecovery.github.io/A.jpg" alt="User Profile" class="user-img">
+                <div class="message-content">Ota tumi mukhe bolcho asole jdi pao kaoke korei libe jani seta</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Ami khub valo go</div>
+            </div>
+            <div class="message received">
+                <img src="https://quilbotrecovery.github.io/A.jpg" alt="User Profile" class="user-img">
+                <div class="message-content">Se jani to koto bhalo</div>
+            </div>
+            <div class="message received">
+                <img src="https://quilbotrecovery.github.io/A.jpg" alt="User Profile" class="user-img">
+                <div class="message-content">ekkhuni boli call korbo omni songe songe haaa dibe</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Koro na go</div>
+            </div>
+            <div class="message received">
+                <img src="https://quilbotrecovery.github.io/A.jpg" alt="User Profile" class="user-img">
+                <div class="message-content">Ei to suru hoye gelo nirllojjo ta akta</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">😙</div>
+            </div>
+            <div class="message special">
+                <div class="video-call-icon">
+                    <img src="https://quilbotrecovery.github.io/1.png" alt="Video Call Started">
+                    <div>Video call started</div>
+                </div>
+                <div class="timestamp">10:17 PM</div>
+            </div>
+            <div class="message special">
+                <div class="video-call-icon">
+                    <img src="https://quilbotrecovery.github.io/2.png" alt="Video Call Ended">
+                    <div>Video call ended</div>
+                </div>
+                <div class="timestamp">10:51 PM</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Barche barche😙</div>
+            </div>
+            <div class="message received">
+                <img src="https://quilbotrecovery.github.io/A.jpg" alt="User Profile" class="user-img">
+                <div class="message-content">Hm barche to toamr chotolokami</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Na go onno kichu</div>
+            </div>
+            <div class="message received">
+                <img src="https://quilbotrecovery.github.io/A.jpg" alt="User Profile" class="user-img">
+                <div class="message-content">Ghumote jachi jalabe na</div>
+            </div>
+            <div class="message received">
+                <img src="https://quilbotrecovery.github.io/A.jpg" alt="User Profile" class="user-img">
+                <div class="message-content">Bye</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Gn8</div>
+            </div>
+            <div class="timestamp">Jul 12, 10:46 PM</div>
+            <div class="message sent">
+                <div class="message-content">Oii</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Ki korcho</div>
+            </div>
+            <div class="message received">
+                <img src="https://quilbotrecovery.github.io/A.jpg" alt="User Profile" class="user-img">
+                <div class="message-content">Ma ache pore kotha bolbo</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Ok</div>
+            </div>
+            <div class="message received">
+                <img src="https://quilbotrecovery.github.io/A.jpg" alt="User Profile" class="user-img">
+                <div class="message-content">ha bolo bikele ki bolchile</div>
+            </div>
+            <div class="message received">
+                <img src="https://quilbotrecovery.github.io/A.jpg" alt="User Profile" class="user-img">
+                <div class="message-content">ki ar bolbe video call chara</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Ei to jano to tahole 😁</div>
+            </div>
+            <div class="message special">
+                <div class="video-call-icon">
+                    <img src="https://quilbotrecovery.github.io/1.png" alt="Video Call Started">
+                    <div>Video call started</div>
+                </div>
+                <div class="timestamp">10:57 PM</div>
+            </div>
+            <div class="message special">
+                <div class="video-call-icon">
+                    <img src="https://quilbotrecovery.github.io/2.png" alt="Video Call Ended">
+                    <div>Video call ended</div>
+                </div>
+                <div class="timestamp">11:41 PM</div>
+            </div>
+            <div class="message received">
+                <img src="https://quilbotrecovery.github.io/A.jpg" alt="User Profile" class="user-img">
+                <div class="message-content">Holo abr ami ghumay </div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Ok Gn8</div>
+            </div>
+            <div class="message received">
+                <img src="https://quilbotrecovery.github.io/A.jpg" alt="User Profile" class="user-img">
+                <div class="message-content">Good night</div>
+            </div>
+            <div class="message received">
+                <img src="https://quilbotrecovery.github.io/A.jpg" alt="User Profile" class="user-img">
+                <div class="message-content">Bye</div>
+            </div>
+            <div class="timestamp">Jul 13, 3:21 PM</div>
+            <div class="message received">
+                <img src="https://quilbotrecovery.github.io/A.jpg" alt="User Profile" class="user-img">
+                <div class="message-content">Ki go dufure periye gele kothay jachile</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Kokon ?</div>
+            </div>
+            <div class="message received">
+                <img src="https://quilbotrecovery.github.io/A.jpg" alt="User Profile" class="user-img">
+                <div class="message-content">dufure bhat khawar age tai</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Ooo</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Amni beriyechilom</div>
+            </div>
+            <div class="message received">
+                <img src="https://quilbotrecovery.github.io/A.jpg" alt="User Profile" class="user-img">
+                <div class="message-content">Kno kaj kormo nai call kora ghure berano chara</div>
+            </div>
+            <div class="timestamp">Jul 14, 4:05 PM</div>
+            <div class="message sent">
+                <div class="message-content">Na go</div>
+            </div>
+            <div class="message received">
+                <img src="https://quilbotrecovery.github.io/A.jpg" alt="User Profile" class="user-img">
+                <div class="message-content">Sei ar ki</div>
+            </div>
+            <div class="message received">
+                <img src="https://quilbotrecovery.github.io/A.jpg" alt="User Profile" class="user-img">
+                <div class="message-content">Atoi important kaj 1 din por reply dicho ar sara dine kono kotha nai khub bhalo</div>
+            </div>
+            <div class="message received">
+                <img src="https://quilbotrecovery.github.io/A.jpg" alt="User Profile" class="user-img">
+                <div class="message-content">Kaj koro </div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Na go</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Are aktu dorkar chilo</div>
+            </div>
+            <div class="message received">
+                <img src="https://quilbotrecovery.github.io/A.jpg" alt="User Profile" class="user-img">
+                <div class="message-content">ki dorkar ?</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Oi aktu chilo</div>
+            </div>
+            <div class="message received">
+                <img src="https://quilbotrecovery.github.io/A.jpg" alt="User Profile" class="user-img">
+                <div class="message-content">mane tumi bolbe na tai to ?</div>
+            </div>
+            <div class="message received">
+                <img src="https://quilbotrecovery.github.io/A.jpg" alt="User Profile" class="user-img">
+                <div class="message-content">Thik ache</div>
+            </div>
+            <div class="message received">
+                <img src="https://quilbotrecovery.github.io/A.jpg" alt="User Profile" class="user-img">
+                <div class="message-content">Tumi kaj koro amake message koro na ar , ar call to motei korbe na</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Na go </div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Oi</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Oii</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Suno na</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">oiiii</div>
+            </div>
+            <div class="timestamp">Jul 14, 7:12 PM</div>
+            <div class="message sent">
+                <div class="message-content">Suno na</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Tumi kotha bolbe na</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">😟</div>
+            </div>
+            <div class="message received">
+                <img src="https://quilbotrecovery.github.io/A.jpg" alt="User Profile" class="user-img">
+                <div class="message-content">Tomar nijer kaj ta atoi personal amakeo bolte bhabte hoche </div>
+            </div>
+            <div class="message received">
+                <img src="https://quilbotrecovery.github.io/A.jpg" alt="User Profile" class="user-img">
+                <div class="message-content">Khub bhalo</div>
+            </div>
+            <div class="message received">
+                <img src="https://quilbotrecovery.github.io/A.jpg" alt="User Profile" class="user-img">
+                <div class="message-content">Amake msg call korbe na</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Na go 😟</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Oii</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Suno na</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Ki go</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Oi</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Oiiiiii</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Suno na</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Sorry </div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Sorry</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Sorry</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Sorry</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Sorry</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Sorry</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Sorry</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Sorry</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Sorry</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Sorry</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Sorry</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Sorry</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Sorry</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Ami adda dite gechilam</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Bolle tumi chillao tai bolchilam na</div>
+            </div>
+            <div class="timestamp">Jul 15, 10:26 AM</div>
+            <div class="message received">
+                <img src="https://quilbotrecovery.github.io/A.jpg" alt="User Profile" class="user-img">
+                <div class="message-content">Khub bhalo atokhon to boloni ar bolte hobe na</div>
+            </div>
+            <div class="message received">
+                <img src="https://quilbotrecovery.github.io/A.jpg" alt="User Profile" class="user-img">
+                <div class="message-content">Ar tomake baron kora sotteo sei adda dite gele to ?</div>
+            </div>
+            <div class="message received">
+                <img src="https://quilbotrecovery.github.io/A.jpg" alt="User Profile" class="user-img">
+                <div class="message-content">Thik ache nao ar akta call b msg o dhukbe na amr kache </div>
+            </div>
+            <div class="message received">
+                <img src="https://quilbotrecovery.github.io/A.jpg" alt="User Profile" class="user-img">
+                <div class="message-content">Bye</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Sorry</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Sorry</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Sorry</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Sorry</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Sorry</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Sorry</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Sorry</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Sorry</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Sorry</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Sorry</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Ar jabo na</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Ki go</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Oii </div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Kotha bolbe na to</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Oii</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Suno na</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Oii</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Block kore dile to ? 😟</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Ki ar bolbo amar messge koreo ki hobe block kore diyecho unblock korle dekhbe ar ki </div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">😟</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Bye</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Ami ar jalabo na unblock kole tumi msg korbe amiar jalabo ni 😔</div>
+            </div>
+            <div class="message sent">
+                <div class="message-content">Bye</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
